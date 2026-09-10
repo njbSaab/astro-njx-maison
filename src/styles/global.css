@@ -37,7 +37,11 @@ input[type='range'] { accent-color: var(--color-acc); }
 
 /* hatched placeholder behind every photo (shows through on missing images) */
 .hatch {
-  background: repeating-linear-gradient(135deg, oklch(0.94 0.004 0) 0 6px, oklch(0.965 0.002 0) 6px 12px);
+  /* image only — the `background` shorthand would reset background-size and
+     defeat the bg-cover/bg-center utilities on photo cards */
+  background-image: repeating-linear-gradient(135deg, oklch(0.94 0.004 0) 0 6px, oklch(0.965 0.002 0) 6px 12px);
+  background-size: cover;
+  background-position: center;
 }
 
 /* outline button that inverts on hover */
