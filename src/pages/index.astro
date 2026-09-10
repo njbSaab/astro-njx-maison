@@ -1,0 +1,303 @@
+---
+// Maison archive page — house hero, printed facet rail (valuation, house,
+// material, era, availability with counts), archive sort, grid/list views,
+// filter chips. Piece details open in the Layout drawer.
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout>
+  <main class="mx-auto max-w-[1240px] px-6" data-catalog>
+
+    <!-- house hero -->
+    <section class="flex flex-wrap items-end gap-x-12 gap-y-7 border-b border-line pb-9 pt-14">
+      <div class="min-w-0 flex-[1_1_380px]">
+        <div class="eti mb-[18px] text-acc" style="letter-spacing:0.18em">Archive editions</div>
+        <h1 data-hero-title class="font-sf m-0 text-[clamp(30px,4.4vw,46px)] leading-[1.1] tracking-[-0.01em]"></h1>
+      </div>
+      <p data-hero-blurb class="m-0 min-w-0 flex-[1_1_280px] text-[14.5px] leading-[1.7] text-soft"></p>
+    </section>
+
+    <div id="archive" class="flex flex-wrap items-start gap-x-[52px] gap-y-9 pt-8">
+
+      <!-- facet rail -->
+      <aside class="flex min-w-0 max-w-[260px] flex-[1_1_220px] flex-col gap-7">
+        <div class="flex flex-col gap-3">
+          <div class="eti text-muted">Valuation, <span data-cur-sign>$</span></div>
+          <input data-price-range type="range" class="w-full" />
+          <div class="flex items-center gap-2 font-mono text-[12px] text-soft">
+            <input data-price-min class="w-full min-w-0 rounded-[2px] border border-rule bg-transparent px-[7px] py-[5px] font-mono text-[12px] text-ink outline-none" />
+            <span class="text-faint">—</span>
+            <input data-price-max class="w-full min-w-0 rounded-[2px] border border-rule bg-transparent px-[7px] py-[5px] font-mono text-[12px] text-ink outline-none" />
+          </div>
+        </div>
+        <div data-facets class="flex flex-col gap-7"></div>
+      </aside>
+
+      <!-- results -->
+      <section class="flex min-w-0 flex-[999_1_520px] flex-col gap-6">
+        <div class="flex flex-wrap items-center gap-x-[18px] gap-y-3 border-b border-line pb-3.5">
+          <span data-count class="eti text-muted" style="font-size:11px"></span>
+          <span class="flex-1"></span>
+          <select data-sort class="rounded-[2px] border border-rule bg-transparent px-2.5 py-1.5 text-[13px] text-ink outline-none">
+            <option value="archive">Archive selection</option>
+            <option value="asc">Valuation, ascending</option>
+            <option value="desc">Valuation, descending</option>
+            <option value="rating">Patron rating</option>
+            <option value="rare">Museum rarities</option>
+          </select>
+          <div class="eti flex gap-3.5" style="font-size:11px">
+            <button data-view="grid" class="cursor-pointer text-faint [&.on]:tab-on">Grid</button>
+            <button data-view="list" class="cursor-pointer text-faint [&.on]:tab-on">List</button>
+          </div>
+        </div>
+
+        <div data-chips class="hidden flex-wrap items-center gap-2 [&.on]:flex"></div>
+
+        <div data-grid></div>
+
+        <div data-empty class="hidden py-[72px] text-center text-muted [&.on]:block">
+          <div class="font-sf mb-3 text-[22px]">No matches in the archive</div>
+          <button data-clear-all class="link-rule cursor-pointer text-acc">Clear filters</button>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    const D = (window as any).MAISON ?? JSON.parse(document.body.dataset.maison!);
+    const $ = <T extends HTMLElement = HTMLElement>(s: string) => document.querySelector<T>(s)!;
+    const getHouse = () => localStorage.getItem('njx-maison-house') ?? 'horlogerie';
+    const houseOf = (h: string) => D.houses.find((x: any) => x.handle === h) ?? D.houses[0];
+    const money = (n: number) => (window as any).maisonMoney ? (window as any).maisonMoney(n) : '$' + n.toLocaleString('en-US');
+    const savedOf = (): string[] => { try { return JSON.parse(localStorage.getItem('njx-maison-vault') ?? '[]'); } catch { return []; } };
+    const bagOf = (): string[] => { try { return JSON.parse(localStorage.getItem('njx-maison-bag') ?? '[]'); } catch { return []; } };
+
+    // filter state (prototype semantics)
+    let brands = new Set<string>(), materials = new Set<string>(), epochs = new Set<string>(), flags = new Set<string>();
+    let min = 0; let max: number | null = null;
+    let sort = 'archive', view = 'grid';
+    let open: Record<string, boolean> = { brands: true, materials: true, epochs: false, flags: false };
+    const FLAGS: [string, string][] = [['stock', 'In the vault'], ['bespoke', 'Bespoke commission'], ['top', 'Rated 4.9★ and above']];
+
+    const pool = () => D.pieces.filter((p: any) => p.house === getHouse());
+    function bounds() {
+      const ps = pool().map((p: any) => p.price);
+      const hi = Math.ceil(Math.max(...ps) / 1000) * 1000;
+      return { min: 0, max: hi, step: Math.max(1000, Math.round(hi / 60 / 1000) * 1000) };
+    }
+    function reset() {
+      brands.clear(); materials.clear(); epochs.clear(); flags.clear();
+      min = 0; max = null; sort = 'archive';
+      ($('[data-sort]') as HTMLSelectElement).value = 'archive';
+    }
+    function filtered() {
+      const b = bounds();
+      const hi = max == null ? b.max : max;
+      let out = pool().filter((p: any) =>
+        p.price >= min && p.price <= hi &&
+        (!brands.size || brands.has(p.brand)) &&
+        (!materials.size || materials.has(p.material)) &&
+        (!epochs.size || epochs.has(p.epoch)) &&
+        (!flags.has('stock') || p.stock) &&
+        (!flags.has('bespoke') || p.bespoke) &&
+        (!flags.has('top') || p.rating >= 4.9));
+      if (sort === 'asc') out = out.slice().sort((a: any, c: any) => a.price - c.price);
+      if (sort === 'desc') out = out.slice().sort((a: any, c: any) => c.price - a.price);
+      if (sort === 'rating') out = out.slice().sort((a: any, c: any) => c.rating - a.rating);
+      if (sort === 'rare') out = out.filter((p: any) => p.bespoke || p.rating >= 4.9);
+      return out;
+    }
+
+    // ── hero ──
+    function paintHero() {
+      const h = houseOf(getHouse());
+      $('[data-hero-title]').textContent = h.title;
+      $('[data-hero-blurb]').textContent = h.blurb;
+    }
+
+    // ── facets ──
+    function facetGroup(key: string, title: string, opts: { label: string; count: string | number; on: boolean }[], toggleAttr: string) {
+      const isOpen = !!open[key];
+      return `
+        <div class="flex flex-col gap-[11px]">
+          <button data-sec="${key}" class="eti flex cursor-pointer items-baseline gap-2.5 text-left text-muted">
+            <span class="flex-1">${title}</span><span class="text-acc">${isOpen ? '–' : '+'}</span>
+          </button>
+          ${isOpen ? `<div class="flex flex-col gap-[9px]">
+            ${opts.map((o) => `
+              <button ${toggleAttr}="${o.label.replace(/"/g, '&quot;')}" class="flex min-h-[22px] cursor-pointer items-baseline gap-2.5 text-left text-[13.5px] text-ink transition hover:text-acc">
+                <span class="font-mono text-[11px] ${o.on ? 'text-acc' : 'text-[oklch(0.78_0.006_0)]'}">${o.on ? '✕' : '·'}</span>
+                <span class="flex-1 leading-[1.4]">${o.label}</span>
+                <span class="font-mono text-[11px] text-faint">${o.count}</span>
+              </button>`).join('')}
+          </div>` : ''}
+        </div>`;
+    }
+    function paintFacets() {
+      const h = houseOf(getHouse());
+      const ps = pool();
+      const b = bounds();
+      const uniq = (field: string) => [...new Set(ps.map((p: any) => p[field]))] as string[];
+      const count = (field: string, v: string) => ps.filter((p: any) => p[field] === v).length;
+
+      const r = $('[data-price-range]') as HTMLInputElement;
+      r.min = String(b.min); r.max = String(b.max); r.step = String(b.step);
+      r.value = String(max == null ? b.max : max);
+      ($('[data-price-min]') as HTMLInputElement).value = String(min);
+      ($('[data-price-max]') as HTMLInputElement).value = String(max == null ? b.max : max);
+      $('[data-cur-sign]').textContent = money(0).replace(/[0-9,\s]/g, '');
+
+      $('[data-facets]').innerHTML =
+        facetGroup('brands', h.brandLabel, uniq('brand').map((v) => ({ label: v, count: count('brand', v), on: brands.has(v) })), 'data-f-brand') +
+        facetGroup('materials', 'Material', uniq('material').map((v) => ({ label: v, count: count('material', v), on: materials.has(v) })), 'data-f-material') +
+        facetGroup('epochs', 'Era', uniq('epoch').map((v) => ({ label: v, count: count('epoch', v), on: epochs.has(v) })), 'data-f-epoch') +
+        facetGroup('flags', 'Availability', FLAGS.map(([k, label]) => ({ label, count: '', on: flags.has(k) })), 'data-f-flag');
+    }
+
+    // ── chips ──
+    function paintChips() {
+      const chips: { label: string; undo: () => void }[] = [];
+      brands.forEach((v) => chips.push({ label: v, undo: () => brands.delete(v) }));
+      materials.forEach((v) => chips.push({ label: v, undo: () => materials.delete(v) }));
+      epochs.forEach((v) => chips.push({ label: v, undo: () => epochs.delete(v) }));
+      flags.forEach((f) => { const fl = FLAGS.find((x) => x[0] === f); if (fl) chips.push({ label: fl[1], undo: () => flags.delete(f) }); });
+      if (min > 0 || max != null) chips.push({ label: `${money(min)} — ${money(max == null ? bounds().max : max)}`, undo: () => { min = 0; max = null; } });
+      const box = $('[data-chips]');
+      box.classList.toggle('on', chips.length > 0);
+      (window as any).__chipUndo = chips.map((c) => c.undo);
+      box.innerHTML = chips.map((c, i) => `
+        <button data-chip="${i}" class="flex cursor-pointer items-center gap-2 rounded-[2px] border border-[oklch(0.86_0.02_25)] px-[9px] py-[5px] text-[12.5px] text-[oklch(0.4_0.06_25)] transition hover:bg-[oklch(0.955_0.012_25)]">
+          <span>${c.label}</span><span class="font-mono text-[11px]">✕</span>
+        </button>`).join('') +
+        (chips.length ? '<button data-chips-clear class="eti ml-1.5 cursor-pointer text-faint" style="font-size:11px">Clear all</button>' : '');
+    }
+
+    // ── cards ──
+    function actions(p: any): string {
+      const saved = savedOf().includes(p.handle);
+      const inBag = bagOf().includes(p.handle);
+      return `
+        <div class="eti mt-1.5 flex gap-4" style="font-size:10.5px">
+          <button data-card-save="${p.handle}" class="cursor-pointer border-b border-[oklch(0.88_0.02_25)] pb-0.5 text-acc">${saved ? 'Saved ✓' : 'Save'}</button>
+          <button data-card-bag="${p.handle}" class="cursor-pointer border-b border-rule pb-0.5 text-soft">${inBag ? 'In the bag ✓' : 'Add to bag'}</button>
+        </div>`;
+    }
+    function card(p: any): string {
+      return `
+        <article class="flex flex-col gap-3.5">
+          <button data-open-piece="${p.handle}" class="hatch flex aspect-[4/5] cursor-pointer items-end border border-line bg-cover bg-center p-3 text-left" style="background-image:url('${p.image}')">
+            <span class="bg-card px-1.5 py-[3px] font-mono text-[10px] tracking-[0.08em] text-faint">${p.kind}</span>
+          </button>
+          <div class="flex flex-col gap-1.5">
+            <span class="eti text-faint" style="font-size:10px">${p.brand}</span>
+            <button data-open-piece="${p.handle}" class="font-sf cursor-pointer text-left text-[18px] leading-[1.25]">${p.name}</button>
+            <span class="text-[13px] text-soft">${p.material}</span>
+            <div class="mt-1 flex items-baseline gap-2.5">
+              <span class="font-mono text-[13px]" data-usd="${p.price}">${money(p.price)}</span>
+              <span class="font-mono text-[11px] text-faint">${p.rating.toFixed(1)}★</span>
+            </div>
+            ${p.bespoke ? '<span class="eti text-acc" style="font-size:10px">Bespoke only</span>' : ''}
+            ${actions(p)}
+          </div>
+        </article>`;
+    }
+    function listRow(p: any): string {
+      const avail = p.bespoke ? 'Bespoke' : (p.stock ? 'In vault' : 'On request');
+      return `
+        <article class="flex flex-wrap items-start gap-x-[26px] gap-y-4 border-b border-line py-[22px] transition hover:bg-card">
+          <button data-open-piece="${p.handle}" class="hatch aspect-[4/5] w-[88px] flex-none cursor-pointer border border-line bg-cover bg-center" style="background-image:url('${p.image}')"></button>
+          <div class="flex min-w-0 flex-[1_1_300px] flex-col gap-[7px]">
+            <span class="eti text-faint" style="font-size:10px">${p.brand} · ${p.ref}</span>
+            <button data-open-piece="${p.handle}" class="font-sf cursor-pointer text-left text-[20px] leading-[1.25]">${p.name}</button>
+            <span class="max-w-[62ch] text-[13.5px] leading-[1.6] text-soft">${p.note}</span>
+            <span class="font-mono text-[11px] text-faint">${p.spec}</span>
+            ${actions(p)}
+          </div>
+          <div class="flex flex-[0_1_140px] flex-col gap-1.5">
+            <span class="font-mono text-[14px]" data-usd="${p.price}">${money(p.price)}</span>
+            <span class="font-mono text-[11px] text-faint">${p.rating.toFixed(1)}★</span>
+            <span class="eti text-muted" style="font-size:10px">${avail}</span>
+          </div>
+        </article>`;
+    }
+    function paintGrid() {
+      const h = houseOf(getHouse());
+      const items = filtered();
+      $('[data-count]').textContent = `${items.length} of ${pool().length} pieces`;
+      $('[data-empty]').classList.toggle('on', items.length === 0);
+      document.querySelectorAll<HTMLElement>('[data-view]').forEach((b) => b.classList.toggle('on', b.dataset.view === view));
+      const grid = $('[data-grid]');
+      if (!items.length) { grid.innerHTML = ''; return; }
+      if (view === 'grid') {
+        grid.className = 'grid gap-x-[30px] gap-y-10';
+        (grid as HTMLElement).style.gridTemplateColumns = 'repeat(auto-fill, minmax(210px, 1fr))';
+        grid.innerHTML = items.map(card).join('');
+      } else {
+        grid.className = 'flex flex-col';
+        (grid as HTMLElement).style.gridTemplateColumns = '';
+        grid.innerHTML = items.map(listRow).join('');
+      }
+    }
+    function paintAll() { paintHero(); paintFacets(); paintChips(); paintGrid(); }
+
+    // ── events ──
+    $('[data-facets]').addEventListener('click', (e) => {
+      const t = e.target as HTMLElement;
+      const sec = t.closest<HTMLElement>('[data-sec]');
+      if (sec) { open[sec.dataset.sec!] = !open[sec.dataset.sec!]; return paintFacets(); }
+      const tb = t.closest<HTMLElement>('[data-f-brand]');
+      if (tb) { const v = tb.dataset.fBrand!; brands.has(v) ? brands.delete(v) : brands.add(v); return paintAll(); }
+      const tm = t.closest<HTMLElement>('[data-f-material]');
+      if (tm) { const v = tm.dataset.fMaterial!; materials.has(v) ? materials.delete(v) : materials.add(v); return paintAll(); }
+      const te = t.closest<HTMLElement>('[data-f-epoch]');
+      if (te) { const v = te.dataset.fEpoch!; epochs.has(v) ? epochs.delete(v) : epochs.add(v); return paintAll(); }
+      const tf = t.closest<HTMLElement>('[data-f-flag]');
+      if (tf) {
+        const fl = FLAGS.find((x) => x[1] === tf.dataset.fFlag);
+        if (fl) { flags.has(fl[0]) ? flags.delete(fl[0]) : flags.add(fl[0]); }
+        return paintAll();
+      }
+    });
+    $('[data-price-range]').addEventListener('input', (e) => {
+      max = Number((e.target as HTMLInputElement).value);
+      ($('[data-price-max]') as HTMLInputElement).value = String(max);
+      paintChips(); paintGrid();
+    });
+    $('[data-price-min]').addEventListener('change', (e) => {
+      const v = Number((e.target as HTMLInputElement).value.replace(/\D/g, ''));
+      min = isNaN(v) ? 0 : v;
+      paintAll();
+    });
+    $('[data-price-max]').addEventListener('change', (e) => {
+      const v = Number((e.target as HTMLInputElement).value.replace(/\D/g, ''));
+      max = isNaN(v) || !v ? null : v;
+      paintAll();
+    });
+    $('[data-chips]').addEventListener('click', (e) => {
+      const t = e.target as HTMLElement;
+      if (t.closest('[data-chips-clear]')) { reset(); return paintAll(); }
+      const chip = t.closest<HTMLElement>('[data-chip]');
+      if (chip) { (window as any).__chipUndo[Number(chip.dataset.chip)](); paintAll(); }
+    });
+    $('[data-clear-all]').addEventListener('click', () => { reset(); paintAll(); });
+    ($('[data-sort]') as HTMLSelectElement).addEventListener('change', (e) => { sort = (e.target as HTMLSelectElement).value; paintGrid(); });
+    document.querySelectorAll<HTMLElement>('[data-view]').forEach((b) =>
+      b.addEventListener('click', () => { view = b.dataset.view!; paintGrid(); }));
+
+    // card save/bag: write straight to localStorage-backed stores via Layout events
+    document.addEventListener('click', (e) => {
+      const t = e.target as HTMLElement;
+      const sv = t.closest<HTMLElement>('[data-card-save]');
+      const bg = t.closest<HTMLElement>('[data-card-bag]');
+      if (!sv && !bg) return;
+      // Layout owns the stores — mirror through a custom event it listens to
+      document.dispatchEvent(new CustomEvent('maison:toggle', { detail: { kind: sv ? 'vault' : 'bag', handle: (sv ?? bg)!.dataset.cardSave ?? (bg as HTMLElement).dataset.cardBag } }));
+    });
+    document.addEventListener('maison:saved-changed', paintGrid);
+    document.addEventListener('maison:bag-changed', paintGrid);
+    document.addEventListener('maison:currency', paintGrid);
+    document.addEventListener('maison:house', () => { reset(); paintAll(); });
+
+    paintAll();
+  </script>
+</Layout>
