@@ -173,21 +173,25 @@ import Layout from '../layouts/Layout.astro';
     }
 
     // ── cards ──
-    function actions(p: any): string {
-      const saved = savedOf().includes(p.handle);
+    const HEART = (on: boolean) => `<svg class="ico" viewBox="0 0 24 24" fill="${on ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>`;
+    const BAG = `<svg class="ico-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>`;
+    function bagBtn(p: any, extra = ''): string {
       const inBag = bagOf().includes(p.handle);
-      return `
-        <div class="eti mt-1.5 flex gap-4" style="font-size:10.5px">
-          <button data-card-save="${p.handle}" class="cursor-pointer border-b border-[oklch(0.88_0.02_25)] pb-0.5 text-acc">${saved ? 'Saved ✓' : 'Save'}</button>
-          <button data-card-bag="${p.handle}" class="cursor-pointer border-b border-rule pb-0.5 text-soft">${inBag ? 'In the bag ✓' : 'Add to bag'}</button>
-        </div>`;
+      return `<button data-card-bag="${p.handle}" class="btn-keeper flex items-center justify-center gap-2 px-4 py-2.5 ${inBag ? 'is-on' : ''} ${extra}">${BAG}<span>${inBag ? 'In the bag ✓' : 'Add to bag'}</span></button>`;
+    }
+    function heartPin(p: any, extra = ''): string {
+      const saved = savedOf().includes(p.handle);
+      return `<button data-card-save="${p.handle}" title="${saved ? 'Remove from vault' : 'Save to vault'}" class="pin-btn ${saved ? 'is-on' : ''} ${extra}">${HEART(saved)}</button>`;
     }
     function card(p: any): string {
       return `
-        <article class="flex flex-col gap-3.5">
-          <button data-open-piece="${p.handle}" class="hatch flex aspect-[4/5] cursor-pointer items-end border border-line bg-cover bg-center p-3 text-left" style="background-image:url('${p.image}')">
-            <span class="bg-card px-1.5 py-[3px] font-mono text-[10px] tracking-[0.08em] text-faint">${p.kind}</span>
-          </button>
+        <article class="group flex flex-col gap-3.5">
+          <div class="relative">
+            <button data-open-piece="${p.handle}" class="hatch flex aspect-[4/5] w-full cursor-pointer items-end border border-line bg-cover bg-center p-3 text-left" style="background-image:url('${p.image}')">
+              <span class="bg-card px-1.5 py-[3px] font-mono text-[10px] tracking-[0.08em] text-faint">${p.kind}</span>
+            </button>
+            ${heartPin(p, 'absolute right-2.5 top-2.5')}
+          </div>
           <div class="flex flex-col gap-1.5">
             <span class="eti text-faint" style="font-size:10px">${p.brand}</span>
             <button data-open-piece="${p.handle}" class="font-sf cursor-pointer text-left text-[18px] leading-[1.25]">${p.name}</button>
@@ -195,9 +199,9 @@ import Layout from '../layouts/Layout.astro';
             <div class="mt-1 flex items-baseline gap-2.5">
               <span class="font-mono text-[13px]" data-usd="${p.price}">${money(p.price)}</span>
               <span class="font-mono text-[11px] text-faint">${p.rating.toFixed(1)}★</span>
+              ${p.bespoke ? '<span class="eti text-acc" style="font-size:10px">Bespoke only</span>' : ''}
             </div>
-            ${p.bespoke ? '<span class="eti text-acc" style="font-size:10px">Bespoke only</span>' : ''}
-            ${actions(p)}
+            ${bagBtn(p, 'mt-2 w-full')}
           </div>
         </article>`;
     }
@@ -205,18 +209,21 @@ import Layout from '../layouts/Layout.astro';
       const avail = p.bespoke ? 'Bespoke' : (p.stock ? 'In vault' : 'On request');
       return `
         <article class="flex flex-wrap items-start gap-x-[26px] gap-y-4 border-b border-line py-[22px] transition hover:bg-card">
-          <button data-open-piece="${p.handle}" class="hatch aspect-[4/5] w-[88px] flex-none cursor-pointer border border-line bg-cover bg-center" style="background-image:url('${p.image}')"></button>
+          <div class="relative flex-none">
+            <button data-open-piece="${p.handle}" class="hatch block aspect-[4/5] w-[110px] cursor-pointer border border-line bg-cover bg-center" style="background-image:url('${p.image}')"></button>
+            ${heartPin(p, 'absolute right-1.5 top-1.5')}
+          </div>
           <div class="flex min-w-0 flex-[1_1_300px] flex-col gap-[7px]">
             <span class="eti text-faint" style="font-size:10px">${p.brand} · ${p.ref}</span>
             <button data-open-piece="${p.handle}" class="font-sf cursor-pointer text-left text-[20px] leading-[1.25]">${p.name}</button>
             <span class="max-w-[62ch] text-[13.5px] leading-[1.6] text-soft">${p.note}</span>
             <span class="font-mono text-[11px] text-faint">${p.spec}</span>
-            ${actions(p)}
           </div>
-          <div class="flex flex-[0_1_140px] flex-col gap-1.5">
+          <div class="flex flex-[0_1_170px] flex-col gap-1.5">
             <span class="font-mono text-[14px]" data-usd="${p.price}">${money(p.price)}</span>
             <span class="font-mono text-[11px] text-faint">${p.rating.toFixed(1)}★</span>
             <span class="eti text-muted" style="font-size:10px">${avail}</span>
+            ${bagBtn(p, 'mt-2')}
           </div>
         </article>`;
     }
@@ -284,15 +291,7 @@ import Layout from '../layouts/Layout.astro';
     document.querySelectorAll<HTMLElement>('[data-view]').forEach((b) =>
       b.addEventListener('click', () => { view = b.dataset.view!; paintGrid(); }));
 
-    // card save/bag: write straight to localStorage-backed stores via Layout events
-    document.addEventListener('click', (e) => {
-      const t = e.target as HTMLElement;
-      const sv = t.closest<HTMLElement>('[data-card-save]');
-      const bg = t.closest<HTMLElement>('[data-card-bag]');
-      if (!sv && !bg) return;
-      // Layout owns the stores — mirror through a custom event it listens to
-      document.dispatchEvent(new CustomEvent('maison:toggle', { detail: { kind: sv ? 'vault' : 'bag', handle: (sv ?? bg)!.dataset.cardSave ?? (bg as HTMLElement).dataset.cardBag } }));
-    });
+    // card save/bag clicks are handled globally by the Layout (it owns the stores)
     document.addEventListener('maison:saved-changed', paintGrid);
     document.addEventListener('maison:bag-changed', paintGrid);
     document.addEventListener('maison:currency', paintGrid);

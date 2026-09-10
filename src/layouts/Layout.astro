@@ -110,8 +110,14 @@ const clientData = JSON.stringify({
         <nav class="flex flex-wrap items-center gap-[22px] text-[13.5px] tracking-[0.02em]">
           <button data-mega-btn class="cursor-pointer pb-0.5 text-soft transition hover:text-acc [&.open]:tab-on">Collections</button>
           <a href="/#archive" class="text-soft transition hover:text-acc">Archive</a>
-          <button data-vault-btn class="cursor-pointer text-soft transition hover:text-acc">Saved · <span data-vault-n>0</span></button>
-          <button data-bag-btn class="cursor-pointer text-soft transition hover:text-acc">Bag · <span data-bag-n>0</span></button>
+          <button data-vault-btn title="Private vault" class="flex cursor-pointer items-center gap-1.5 text-soft transition hover:text-acc">
+            <svg data-vault-ico class="ico-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+            <span>Saved · <span data-vault-n>0</span></span>
+          </button>
+          <button data-bag-btn title="Acquisition bag" class="flex cursor-pointer items-center gap-1.5 text-soft transition hover:text-acc">
+            <svg class="ico-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+            <span>Bag · <span data-bag-n>0</span></span>
+          </button>
           <a href="/account" data-patron-link class="hidden tab-on [&.show]:inline"></a>
           <button data-auth-btn class="btn-keeper px-3.5 py-[7px] [&.hide]:hidden">Sign in</button>
         </nav>
@@ -242,6 +248,8 @@ const clientData = JSON.stringify({
       const esc = (s: string) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;');
       (window as any).MAISON = D;
 
+      const HEART = (on: boolean, cls = 'ico-sm') => `<svg class="${cls}" viewBox="0 0 24 24" fill="${on ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>`;
+      const BAG_ICO = `<svg class="ico-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>`;
       const HOUSE_KEY = 'njx-maison-house';
       const getHouse = () => localStorage.getItem(HOUSE_KEY) ?? 'horlogerie';
       const houseOf = (h: string) => D.houses.find((x: any) => x.handle === h) ?? D.houses[0];
@@ -365,11 +373,11 @@ const clientData = JSON.stringify({
                   <span class="min-w-0 flex-1 text-[13.5px] text-ink">${v}</span>
                 </div>`).join('')}
             </div>
-            <div class="flex flex-wrap items-center gap-x-[18px] gap-y-3.5 border-t border-rule pt-5">
+            <div class="flex flex-wrap items-center gap-x-[14px] gap-y-3.5 border-t border-rule pt-5">
               <span class="font-mono text-[17px]" data-usd="${p.price}">${money(p.price)}</span>
               <span class="flex-1"></span>
-              <button data-piece-save="${p.handle}" class="link-rule text-soft">${inVault ? 'Saved ✓' : 'Save'}</button>
-              <button data-piece-bag="${p.handle}" class="btn-keeper px-[22px] py-[13px]">${inBag ? 'In the bag ✓' : 'Add to bag'}</button>
+              <button data-piece-save="${p.handle}" title="${inVault ? 'Remove from vault' : 'Save to vault'}" class="pin-btn ${inVault ? 'is-on' : ''}" style="width:42px;height:42px">${HEART(inVault, 'ico')}</button>
+              <button data-piece-bag="${p.handle}" class="btn-keeper flex items-center gap-2 px-[22px] py-[13px] ${inBag ? 'is-on' : ''}">${BAG_ICO}<span>${inBag ? 'In the bag ✓' : 'Add to bag'}</span></button>
             </div>
             <div class="text-[12.5px] leading-[1.6] text-muted">${p.bespoke ? 'Book the atelier' : 'Request this piece'} — the keeper replies within one business day.</div>
             <a href="/products/${p.handle}" class="eti text-acc" style="font-size:10.5px">Open the full record →</a>
@@ -405,6 +413,7 @@ const clientData = JSON.stringify({
       function renderVault() {
         const list = vault.get();
         $('[data-vault-n]').textContent = String(list.length);
+        $('[data-vault-ico]').setAttribute('fill', list.length ? 'currentColor' : 'none');
         const box = $('[data-vault-lines]');
         box.innerHTML = list.length
           ? list.map((h) => { const p = pieceBy(h); return p ? lineRow(p, `
@@ -559,13 +568,23 @@ const clientData = JSON.stringify({
       document.addEventListener('maison:house', () => paintSearch());
       document.addEventListener('maison:toast' as any, (e: CustomEvent) => toast(e.detail));
       // pages toggle vault/bag through this event — the layout owns the stores
-      document.addEventListener('maison:toggle' as any, (e: CustomEvent) => {
-        const { kind, handle } = e.detail ?? {};
-        if (!handle) return;
+      function toggleFor(kind: string, handle: string) {
         const added = toggleIn(kind === 'vault' ? vault : bag, handle);
         toast(kind === 'vault'
           ? (added ? 'Saved to your private vault' : 'Removed from the vault')
           : (added ? 'Placed in the acquisition bag' : 'Removed from the bag'));
+      }
+      document.addEventListener('maison:toggle' as any, (e: CustomEvent) => {
+        const { kind, handle } = e.detail ?? {};
+        if (handle) toggleFor(kind, handle);
+      });
+      // card-level heart / bag buttons work on every page
+      document.addEventListener('click', (e) => {
+        const t = e.target as HTMLElement;
+        const sv = t.closest<HTMLElement>('[data-card-save]');
+        if (sv) { toggleFor('vault', sv.dataset.cardSave!); return; }
+        const bg = t.closest<HTMLElement>('[data-card-bag]');
+        if (bg) toggleFor('bag', bg.dataset.cardBag!);
       });
 
       paintChrome();
