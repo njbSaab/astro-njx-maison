@@ -18,11 +18,13 @@ import Layout from '../layouts/Layout.astro';
     <div data-cabinet class="hidden [&.show]:block">
       <section class="flex flex-wrap items-end gap-x-10 gap-y-3 border-b border-line pb-4 pt-6 sm:gap-y-6 sm:pb-[30px] sm:pt-14">
         <div class="min-w-0 flex-[1_1_320px]">
-          <div class="eti mb-2 text-acc sm:mb-[18px]" style="letter-spacing:0.18em">Patron cabinet</div>
+          <div class="mb-2 flex items-baseline justify-between gap-4 sm:mb-[18px]">
+            <span class="eti text-acc" style="letter-spacing:0.18em">Patron cabinet</span>
+            <button data-sign-out class="eti cursor-pointer text-faint transition hover:text-acc" style="font-size:11px">Sign out</button>
+          </div>
           <h1 data-p-name class="font-sf m-0 mb-3.5 text-[clamp(28px,4vw,42px)] leading-[1.1]"></h1>
           <div data-p-line class="font-mono text-[11.5px] tracking-[0.04em] text-soft"></div>
         </div>
-        <button data-sign-out class="eti cursor-pointer text-faint" style="font-size:11px">Sign out</button>
       </section>
 
       <section data-p-stats class="grid grid-cols-2 gap-x-4 border-b border-line sm:grid-cols-[repeat(auto-fit,minmax(150px,1fr))]"></section>
