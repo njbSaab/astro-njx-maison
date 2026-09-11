@@ -16,16 +16,16 @@ import Layout from '../layouts/Layout.astro';
     </div>
 
     <div data-cabinet class="hidden [&.show]:block">
-      <section class="flex flex-wrap items-end gap-x-10 gap-y-6 border-b border-line pb-[30px] pt-14">
+      <section class="flex flex-wrap items-end gap-x-10 gap-y-3 border-b border-line pb-4 pt-6 sm:gap-y-6 sm:pb-[30px] sm:pt-14">
         <div class="min-w-0 flex-[1_1_320px]">
-          <div class="eti mb-[18px] text-acc" style="letter-spacing:0.18em">Patron cabinet</div>
+          <div class="eti mb-2 text-acc sm:mb-[18px]" style="letter-spacing:0.18em">Patron cabinet</div>
           <h1 data-p-name class="font-sf m-0 mb-3.5 text-[clamp(28px,4vw,42px)] leading-[1.1]"></h1>
           <div data-p-line class="font-mono text-[11.5px] tracking-[0.04em] text-soft"></div>
         </div>
         <button data-sign-out class="eti cursor-pointer text-faint" style="font-size:11px">Sign out</button>
       </section>
 
-      <section data-p-stats class="grid grid-cols-[repeat(auto-fit,minmax(150px,1fr))] border-b border-line"></section>
+      <section data-p-stats class="grid grid-cols-2 gap-x-4 border-b border-line sm:grid-cols-[repeat(auto-fit,minmax(150px,1fr))]"></section>
 
       <div class="eti flex flex-wrap items-center gap-x-[26px] gap-y-3.5 pt-[18px]" style="font-size:11px">
         <button data-cab-tab="overview" class="cursor-pointer text-soft transition hover:text-acc [&.on]:text-acc [&.on]:border-b [&.on]:border-acc [&.on]:pb-[3px]">Overview</button>
@@ -33,7 +33,7 @@ import Layout from '../layouts/Layout.astro';
         <button data-cab-tab="settings" class="cursor-pointer text-soft transition hover:text-acc [&.on]:text-acc [&.on]:border-b [&.on]:border-acc [&.on]:pb-[3px]">Settings</button>
       </div>
 
-      <div class="flex flex-wrap items-start gap-x-14 gap-y-11 pt-[34px]" data-cab-body></div>
+      <div class="flex flex-wrap items-start gap-x-14 gap-y-8 pt-5 sm:gap-y-11 sm:pt-[34px]" data-cab-body></div>
     </div>
   </main>
 
@@ -98,8 +98,8 @@ import Layout from '../layouts/Layout.astro';
       $('[data-p-name]').textContent = p.name;
       $('[data-p-line]').textContent = `${p.status} · ${p.registry} · member since ${p.since}`;
       $('[data-p-stats]').innerHTML = led.stats.map((s: any[], i: number) => `
-        <div class="flex flex-col gap-2.5 py-7 pr-[22px]">
-          <span class="font-sf text-[28px] leading-none">${i === 0 && s[2] != null ? money(s[2]).replace(/^(.)/, '$1') : s[0]}</span>
+        <div class="flex flex-col gap-1.5 py-3.5 pr-3 sm:gap-2.5 sm:py-7 sm:pr-[22px]">
+          <span class="font-sf text-[21px] leading-none sm:text-[28px]">${i === 0 && s[2] != null ? money(s[2]).replace(/^(.)/, '$1') : s[0]}</span>
           <span class="eti leading-[1.5] text-faint" style="font-size:10px">${s[1]}</span>
         </div>`).join('');
       document.querySelectorAll<HTMLElement>('[data-cab-tab]').forEach((b) => b.classList.toggle('on', b.dataset.cabTab === tab));
