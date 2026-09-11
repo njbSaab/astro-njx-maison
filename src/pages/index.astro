@@ -8,8 +8,8 @@ import Layout from '../layouts/Layout.astro';
 <Layout>
   <main class="mx-auto max-w-[1240px] px-6" data-catalog>
 
-    <!-- house hero: era tiles ride in from the right over the first scroll -->
-    <section data-hero-scene class="flex flex-wrap items-center gap-x-12 gap-y-7 border-b border-line pb-9 pt-14">
+    <!-- house hero -->
+    <section class="flex flex-wrap items-center gap-x-12 gap-y-7 border-b border-line pb-9 pt-14">
       <div class="flex min-w-0 flex-[1_1_380px] flex-col">
         <div class="eti mb-[18px] text-acc" style="letter-spacing:0.18em">Archive editions</div>
         <h1 data-hero-title class="font-sf m-0 text-[clamp(30px,4.4vw,46px)] leading-[1.1] tracking-[-0.01em]"></h1>
@@ -118,7 +118,6 @@ import Layout from '../layouts/Layout.astro';
         <button data-hero-tile data-era="${tl.label}" title="Show ${tl.label} pieces" class="hatch group flex aspect-[3/4] min-w-0 flex-1 cursor-pointer items-end border border-line bg-cover bg-center p-2.5 shadow-[0_14px_28px_-18px_oklch(0.22_0.006_0/0.45)] transition hover:border-acc" style="background-image:url('${tl.img}')">
           <span class="bg-card px-1.5 py-[3px] font-mono text-[10px] tracking-[0.08em] text-faint transition group-hover:text-acc">${tl.label}</span>
         </button>`).join('');
-      heroScene();
     }
     document.addEventListener('click', (e) => {
       const tile = (e.target as HTMLElement).closest<HTMLElement>('[data-hero-tile]');
@@ -131,28 +130,6 @@ import Layout from '../layouts/Layout.astro';
       document.getElementById('archive')?.scrollIntoView({ behavior: 'smooth' });
     });
 
-    // pinned hero scene: tiles ride in from behind the copy as you scroll
-    const heroSceneEl = document.querySelector<HTMLElement>('[data-hero-scene]');
-    function heroScene() {
-      const tiles = document.querySelectorAll<HTMLElement>('[data-hero-tile]');
-      if (!heroSceneEl || !tiles.length) return;
-      if (window.innerWidth < 1024) {
-        tiles.forEach((el) => { el.style.transform = ''; el.style.opacity = ''; });
-        return;
-      }
-      /* no pinning: the shopfront stays put; tiles finish over the first ~500px
-         of ordinary scrolling, and the first one is already in place on load */
-      const prog = Math.min(1, 0.36 + window.scrollY / 520);
-      tiles.forEach((el, i) => {
-        /* one tile at a time, each owns a third of the scene, sliding in from the right */
-        const d = Math.min(1, Math.max(0, (prog - i * 0.33) / 0.3));
-        const e2 = 1 - Math.pow(1 - d, 3);
-        el.style.transform = `translateX(${(1 - e2) * 70}vw)`;
-        el.style.opacity = String(0.1 + 0.9 * e2);
-      });
-    }
-    window.addEventListener('scroll', heroScene, { passive: true });
-    window.addEventListener('resize', heroScene);
 
     // ── facets ──
     function facetGroup(key: string, title: string, opts: { label: string; count: string | number; on: boolean }[], toggleAttr: string) {
