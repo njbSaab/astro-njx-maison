@@ -6,7 +6,7 @@ import Layout from '../layouts/Layout.astro';
 ---
 
 <Layout>
-  <main class="mx-auto max-w-[1240px] px-6" data-catalog>
+  <main class="mx-auto max-w-[1240px] px-2 sm:px-6" data-catalog>
 
     <!-- house hero -->
     <section class="flex flex-wrap items-center gap-x-12 gap-y-7 border-b border-line pb-9 pt-14">
@@ -15,13 +15,15 @@ import Layout from '../layouts/Layout.astro';
         <h1 data-hero-title class="font-sf m-0 text-[clamp(30px,4.4vw,46px)] leading-[1.1] tracking-[-0.01em]"></h1>
         <p data-hero-blurb class="m-0 mt-5 max-w-[54ch] text-[14.5px] leading-[1.7] text-soft"></p>
       </div>
-      <div data-hero-tiles class="flex min-w-0 flex-[1_1_360px] gap-3"></div>
+      <div data-hero-tiles class="no-scrollbar flex min-w-0 flex-[1_1_360px] snap-x snap-mandatory gap-3 overflow-x-auto sm:snap-none sm:overflow-visible"></div>
     </section>
 
     <div id="archive" class="flex flex-wrap items-start gap-x-[52px] gap-y-9 pt-8">
 
       <!-- facet rail -->
-      <aside class="scrollbar-thin sticky top-[86px] flex max-h-[calc(100vh-102px)] min-w-0 max-w-[260px] flex-[1_1_220px] flex-col gap-7 self-start overflow-y-auto pb-2 pr-1">
+      <div data-facet-dim class="fixed inset-0 z-[65] hidden bg-[oklch(0.22_0.006_0/0.42)] [&.open]:block lg:hidden"></div>
+      <aside data-facet-rail class="scrollbar-thin fixed inset-y-0 left-0 z-[70] flex w-[300px] max-w-[86vw] -translate-x-full flex-col gap-7 overflow-y-auto border-r border-line bg-card p-5 transition-transform duration-300 [&.open]:translate-x-0 lg:sticky lg:top-[86px] lg:z-auto lg:max-h-[calc(100vh-102px)] lg:w-auto lg:min-w-0 lg:max-w-[260px] lg:flex-[1_1_220px] lg:translate-x-0 lg:self-start lg:border-r-0 lg:bg-transparent lg:p-0 lg:pb-2 lg:pr-1">
+        <button data-facet-close class="eti -mb-2 cursor-pointer self-end text-soft transition hover:text-acc lg:hidden">Close ✕</button>
         <div class="flex flex-col gap-3">
           <div class="eti text-muted">Valuation, <span data-cur-sign>$</span></div>
           <input data-price-range type="range" class="w-full" />
@@ -37,6 +39,10 @@ import Layout from '../layouts/Layout.astro';
       <!-- results -->
       <section class="flex min-w-0 flex-[999_1_520px] flex-col gap-6">
         <div class="flex flex-wrap items-center gap-x-[18px] gap-y-3 border-b border-line pb-3.5">
+          <button data-facet-open class="eti flex cursor-pointer items-center gap-2 rounded-[2px] border border-rule px-2.5 py-[7px] text-soft transition hover:border-faint lg:hidden" style="font-size:11px">
+            <svg class="ico-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><line x1="4" y1="7" x2="20" y2="7"/><line x1="7" y1="12" x2="17" y2="12"/><line x1="10" y1="17" x2="14" y2="17"/></svg>
+            Filters
+          </button>
           <span data-count class="eti text-muted" style="font-size:11px"></span>
           <span class="flex-1"></span>
           <select data-sort class="rounded-[2px] border border-rule bg-transparent px-2.5 py-1.5 text-[13px] text-ink outline-none">
@@ -115,10 +121,24 @@ import Layout from '../layouts/Layout.astro';
       $('[data-hero-title]').textContent = h.title;
       $('[data-hero-blurb]').textContent = h.blurb;
       $('[data-hero-tiles]').innerHTML = (h.heroTiles || []).map((tl: any) => `
-        <button data-hero-tile data-era="${tl.label}" title="Show ${tl.label} pieces" class="hatch group flex aspect-[3/4] min-w-0 flex-1 cursor-pointer items-end border border-line bg-cover bg-center p-2.5 shadow-[0_14px_28px_-18px_oklch(0.22_0.006_0/0.45)] transition hover:border-acc" style="background-image:url('${tl.img}')">
+        <button data-hero-tile data-era="${tl.label}" title="Show ${tl.label} pieces" class="hatch group flex aspect-[3/4] w-[64%] flex-none snap-center cursor-pointer items-end border border-line bg-cover bg-center p-2.5 sm:w-auto sm:min-w-0 sm:flex-1 shadow-[0_14px_28px_-18px_oklch(0.22_0.006_0/0.45)] transition hover:border-acc" style="background-image:url('${tl.img}')">
           <span class="bg-card px-1.5 py-[3px] font-mono text-[10px] tracking-[0.08em] text-faint transition group-hover:text-acc">${tl.label}</span>
         </button>`).join('');
     }
+    // facet drawer (mobile burger)
+    const railEl = document.querySelector('[data-facet-rail]')!;
+    const dimEl = document.querySelector('[data-facet-dim]')!;
+    function setRail(o: boolean) {
+      railEl.classList.toggle('open', o);
+      dimEl.classList.toggle('open', o);
+      document.body.style.overflow = o && window.innerWidth < 1024 ? 'hidden' : '';
+    }
+    document.addEventListener('click', (e) => {
+      const t = e.target as HTMLElement;
+      if (t.closest('[data-facet-open]')) return setRail(true);
+      if (t.closest('[data-facet-close]') || t.closest('[data-facet-dim]')) return setRail(false);
+    });
+
     document.addEventListener('click', (e) => {
       const tile = (e.target as HTMLElement).closest<HTMLElement>('[data-hero-tile]');
       if (!tile) return;
