@@ -8,17 +8,17 @@ import Layout from '../layouts/Layout.astro';
 <Layout>
   <main class="mx-auto max-w-[1240px] px-6" data-catalog>
 
-    <!-- house hero -->
-    <section class="flex flex-wrap items-center gap-x-12 gap-y-7 border-b border-line pb-9 pt-14">
+    <!-- house hero: pinned scene — era tiles slide in from the left over the copy -->
+    <div data-hero-scene class="lg:h-[185vh]">
+    <section class="flex flex-wrap items-center gap-x-12 gap-y-7 border-b border-line pb-9 pt-14 lg:sticky lg:top-0 lg:min-h-[calc(100vh-96px)] lg:pb-6 lg:pt-24">
       <div class="flex min-w-0 flex-[1_1_380px] flex-col">
         <div class="eti mb-[18px] text-acc" style="letter-spacing:0.18em">Archive editions</div>
         <h1 data-hero-title class="font-sf m-0 text-[clamp(30px,4.4vw,46px)] leading-[1.1] tracking-[-0.01em]"></h1>
         <p data-hero-blurb class="m-0 mt-5 max-w-[54ch] text-[14.5px] leading-[1.7] text-soft"></p>
       </div>
-      <div data-hero-visual class="hatch flex min-w-0 flex-[1_1_300px] items-end self-stretch border border-line bg-cover bg-center p-3 min-h-[220px]">
-        <span data-hero-caption class="bg-card px-1.5 py-[3px] font-mono text-[10px] tracking-[0.08em] text-faint"></span>
-      </div>
+      <div data-hero-tiles class="relative z-10 flex min-w-0 flex-[1_1_360px] gap-3"></div>
     </section>
+    </div>
 
     <div id="archive" class="flex flex-wrap items-start gap-x-[52px] gap-y-9 pt-8">
 
@@ -49,8 +49,8 @@ import Layout from '../layouts/Layout.astro';
             <option value="rare">Museum rarities</option>
           </select>
           <div class="eti flex gap-3.5" style="font-size:11px">
-            <button data-view="grid" class="cursor-pointer text-faint [&.on]:tab-on">Grid</button>
-            <button data-view="list" class="cursor-pointer text-faint [&.on]:tab-on">List</button>
+            <button data-view="grid" class="cursor-pointer text-soft transition hover:text-acc [&.on]:text-acc [&.on]:border-b [&.on]:border-acc [&.on]:pb-[3px]">Grid</button>
+            <button data-view="list" class="cursor-pointer text-soft transition hover:text-acc [&.on]:text-acc [&.on]:border-b [&.on]:border-acc [&.on]:pb-[3px]">List</button>
           </div>
         </div>
 
@@ -116,9 +116,43 @@ import Layout from '../layouts/Layout.astro';
       const h = houseOf(getHouse());
       $('[data-hero-title]').textContent = h.title;
       $('[data-hero-blurb]').textContent = h.blurb;
-      $('[data-hero-visual]').style.backgroundImage = h.heroImage ? `url('${h.heroImage}')` : '';
-      $('[data-hero-caption]').textContent = h.megaImage || '';
+      $('[data-hero-tiles]').innerHTML = (h.heroTiles || []).map((tl: any) => `
+        <button data-hero-tile data-era="${tl.label}" title="Show ${tl.label} pieces" class="hatch group flex aspect-[3/4] min-w-0 flex-1 cursor-pointer items-end border border-line bg-cover bg-center p-2.5 shadow-[0_14px_28px_-18px_oklch(0.22_0.006_0/0.45)] transition hover:border-acc" style="background-image:url('${tl.img}')">
+          <span class="bg-card px-1.5 py-[3px] font-mono text-[10px] tracking-[0.08em] text-faint transition group-hover:text-acc">${tl.label}</span>
+        </button>`).join('');
+      heroScene();
     }
+    document.addEventListener('click', (e) => {
+      const tile = (e.target as HTMLElement).closest<HTMLElement>('[data-hero-tile]');
+      if (!tile) return;
+      const v = tile.dataset.era!;
+      epochs.clear();
+      epochs.add(v);
+      open.epochs = true;
+      paintAll();
+      document.getElementById('archive')?.scrollIntoView({ behavior: 'smooth' });
+    });
+
+    // pinned hero scene: tiles ride in from behind the copy as you scroll
+    const heroSceneEl = document.querySelector<HTMLElement>('[data-hero-scene]');
+    function heroScene() {
+      const tiles = document.querySelectorAll<HTMLElement>('[data-hero-tile]');
+      if (!heroSceneEl || !tiles.length) return;
+      if (window.innerWidth < 1024) {
+        tiles.forEach((el) => { el.style.transform = ''; el.style.opacity = ''; });
+        return;
+      }
+      const total = heroSceneEl.offsetHeight - window.innerHeight;
+      const prog = total > 0 ? Math.min(1, Math.max(0, -heroSceneEl.getBoundingClientRect().top / total)) : 1;
+      tiles.forEach((el, i) => {
+        const d = Math.min(1, Math.max(0, (prog - i * 0.16) / 0.52));
+        const e2 = 1 - Math.pow(1 - d, 3);
+        el.style.transform = `translateX(${(1 - e2) * -58}vw)`;
+        el.style.opacity = String(0.15 + 0.85 * e2);
+      });
+    }
+    window.addEventListener('scroll', heroScene, { passive: true });
+    window.addEventListener('resize', heroScene);
 
     // ── facets ──
     function facetGroup(key: string, title: string, opts: { label: string; count: string | number; on: boolean }[], toggleAttr: string) {

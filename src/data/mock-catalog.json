@@ -72,7 +72,21 @@
    ],
    "count": 12,
    "heroImage": "/products/mhh-0398.jpg",
-   "megaImageSrc": "/products/mhh-1888.jpg"
+   "megaImageSrc": "/products/mhh-1888.jpg",
+   "heroTiles": [
+    {
+     "label": "Belle Époque",
+     "img": "/products/mhh-0398.jpg"
+    },
+    {
+     "label": "Art Deco 1930s",
+     "img": "/products/mhh-0611.jpg"
+    },
+    {
+     "label": "Victorian 1890s",
+     "img": "/products/mhh-1888.jpg"
+    }
+   ]
   },
   {
    "handle": "kingsman",
@@ -146,7 +160,21 @@
    ],
    "count": 12,
    "heroImage": "/products/ks-3311.jpg",
-   "megaImageSrc": "/products/ks-3520.jpg"
+   "megaImageSrc": "/products/ks-3520.jpg",
+   "heroTiles": [
+    {
+     "label": "Belle Époque",
+     "img": "/products/ks-2455.jpg"
+    },
+    {
+     "label": "Art Deco 1930s",
+     "img": "/products/ks-2712.jpg"
+    },
+    {
+     "label": "Victorian 1890s",
+     "img": "/products/ks-3520.jpg"
+    }
+   ]
   },
   {
    "handle": "bibliophiles",
@@ -220,7 +248,21 @@
    ],
    "count": 12,
    "heroImage": "/products/ab-0899.jpg",
-   "megaImageSrc": "/products/ab-1234.jpg"
+   "megaImageSrc": "/products/ab-1234.jpg",
+   "heroTiles": [
+    {
+     "label": "Enlightenment",
+     "img": "/products/ab-0899.jpg"
+    },
+    {
+     "label": "Belle Époque",
+     "img": "/products/ab-2010.jpg"
+    },
+    {
+     "label": "Victorian 1890s",
+     "img": "/products/ab-1234.jpg"
+    }
+   ]
   }
  ],
  "products": [

@@ -99,6 +99,7 @@ const clientData = JSON.stringify({
         <span class="text-faint">Archive houses</span>
         <span data-house-tabs class="flex flex-wrap gap-x-[22px] gap-y-1"></span>
         <span class="flex-1"></span>
+        <a href="https://github.com/njbSaab/astro-njx-maison" target="_blank" rel="noopener" class="text-soft transition hover:text-acc">★ Free on GitHub</a>
         <span data-house-meta class="text-faint"></span>
       </div>
     </div>
@@ -108,7 +109,7 @@ const clientData = JSON.stringify({
       <div class="mx-auto flex max-w-[1240px] flex-wrap items-center gap-x-[26px] gap-y-3.5 px-6 py-3.5">
         <a href="/" data-house-name class="font-sf min-w-0 flex-1 basis-auto text-[20px] tracking-[0.01em] text-ink"></a>
         <nav class="flex flex-wrap items-center gap-[22px] text-[13.5px] tracking-[0.02em]">
-          <button data-mega-btn class="cursor-pointer pb-0.5 text-soft transition hover:text-acc [&.open]:tab-on">Collections</button>
+          <button data-mega-btn class="cursor-pointer pb-0.5 text-soft transition hover:text-acc [&.open]:text-acc [&.open]:border-b [&.open]:border-acc">Collections</button>
           <a href="/#archive" class="text-soft transition hover:text-acc">Archive</a>
           <button data-vault-btn title="Private vault" class="flex cursor-pointer items-center gap-1.5 text-soft transition hover:text-acc">
             <svg data-vault-ico class="ico-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
@@ -150,9 +151,25 @@ const clientData = JSON.stringify({
       <div class="eti mx-auto flex max-w-[1240px] flex-wrap items-center justify-between gap-3 px-6 py-6 text-faint">
         <span><span data-footer-name class="text-soft"></span> · <span data-footer-meta></span></span>
         <span>Astro · Tailwind v4 · Shopify Storefront API</span>
-        <span>Premium theme by <a href="https://njxui.dev" target="_blank" rel="noopener" class="text-acc hover:text-acc-deep">njX UI</a></span>
+        <span>Free theme — <a href="https://github.com/njbSaab/astro-njx-maison" target="_blank" rel="noopener" class="text-soft transition hover:text-acc">★ star it on GitHub</a></span>
+        <span>More themes by <a href="https://njxui.dev/themes" target="_blank" rel="noopener" class="text-acc hover:text-acc-deep">njX UI</a></span>
       </div>
     </footer>
+
+    <!-- ── Thank-you popup (free theme promo) ── -->
+    <div data-thanks-modal class="fixed inset-0 z-[60] hidden items-center justify-center bg-[oklch(0.22_0.006_0/0.42)] p-6 [&.open]:flex">
+      <div class="flex w-[min(440px,100%)] flex-col gap-5 border border-line bg-card p-7 shadow-[0_24px_48px_-24px_oklch(0.22_0.006_0/0.5)]">
+        <div class="flex items-baseline">
+          <span class="eti text-acc">Merci · thank you</span>
+          <span class="flex-1"></span>
+          <button data-thanks-close class="cursor-pointer font-mono text-[12px] text-soft transition hover:text-acc">Close ✕</button>
+        </div>
+        <h3 class="font-sf m-0 text-[24px] leading-[1.25]">The keeper has your request</h3>
+        <p class="m-0 text-[13.5px] leading-[1.7] text-soft">This storefront is a free open-source theme. Grab the full template on GitHub — and if it made you smile, a star would make our day.</p>
+        <a href="https://github.com/njbSaab/astro-njx-maison" target="_blank" rel="noopener" class="btn-keeper px-5 py-3.5 text-center">★ Star astro-njx-maison on GitHub</a>
+        <p class="m-0 text-[12.5px] leading-[1.7] text-muted">More free themes — and the Pro edition of this one — live at <a class="link-rule text-acc" href="https://njxui.dev/themes" target="_blank" rel="noopener">njxui.dev/themes</a>.</p>
+      </div>
+    </div>
 
     <!-- ── Piece drawer ── -->
     <div data-piece-modal class="fixed inset-0 z-40 hidden justify-end bg-[oklch(0.22_0.006_0/0.42)] [&.open]:flex">
@@ -459,7 +476,11 @@ const clientData = JSON.stringify({
       });
       $('[data-request-keeper]').addEventListener('click', () => {
         $('[data-bag-requested]').classList.add('show');
-        toast('Request lodged with the keeper');
+        $('[data-thanks-modal]').classList.add('open');
+      });
+      $('[data-thanks-modal]').addEventListener('click', (e) => {
+        if (e.target === $('[data-thanks-modal]') || (e.target as HTMLElement).closest('[data-thanks-close]'))
+          $('[data-thanks-modal]').classList.remove('open');
       });
       vault.subscribe(() => { renderVault(); document.dispatchEvent(new CustomEvent('maison:saved-changed')); });
       bag.subscribe(() => { renderBag(); document.dispatchEvent(new CustomEvent('maison:bag-changed')); });
