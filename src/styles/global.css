@@ -103,3 +103,7 @@ input[type='range'] { accent-color: var(--color-acc); }
 .anim-fade { animation: fadeIn 0.18s ease both; }
 @keyframes slideIn { from { transform: translateX(24px); opacity: 0.4; } to { transform: none; opacity: 1; } }
 .anim-slide { animation: slideIn 0.22s ease both; }
+
+/* slim scrollbar for the sticky facet rail */
+.scrollbar-thin { scrollbar-width: thin; }
+.scrollbar-thin::-webkit-scrollbar { width: 6px; }

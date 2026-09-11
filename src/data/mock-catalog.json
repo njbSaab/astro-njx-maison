@@ -70,7 +70,9 @@
     "Platinum 950",
     "Chronometer"
    ],
-   "count": 12
+   "count": 12,
+   "heroImage": "/products/mhh-0398.jpg",
+   "megaImageSrc": "/products/mhh-1888.jpg"
   },
   {
    "handle": "kingsman",
@@ -142,7 +144,9 @@
     "Super 160s",
     "Seven-fold"
    ],
-   "count": 12
+   "count": 12,
+   "heroImage": "/products/ks-3311.jpg",
+   "megaImageSrc": "/products/ks-3520.jpg"
   },
   {
    "handle": "bibliophiles",
@@ -214,7 +218,9 @@
     "14K nib",
     "Morocco"
    ],
-   "count": 12
+   "count": 12,
+   "heroImage": "/products/ab-0899.jpg",
+   "megaImageSrc": "/products/ab-1234.jpg"
   }
  ],
  "products": [

@@ -9,18 +9,21 @@ import Layout from '../layouts/Layout.astro';
   <main class="mx-auto max-w-[1240px] px-6" data-catalog>
 
     <!-- house hero -->
-    <section class="flex flex-wrap items-end gap-x-12 gap-y-7 border-b border-line pb-9 pt-14">
-      <div class="min-w-0 flex-[1_1_380px]">
+    <section class="flex flex-wrap items-center gap-x-12 gap-y-7 border-b border-line pb-9 pt-14">
+      <div class="flex min-w-0 flex-[1_1_380px] flex-col">
         <div class="eti mb-[18px] text-acc" style="letter-spacing:0.18em">Archive editions</div>
         <h1 data-hero-title class="font-sf m-0 text-[clamp(30px,4.4vw,46px)] leading-[1.1] tracking-[-0.01em]"></h1>
+        <p data-hero-blurb class="m-0 mt-5 max-w-[54ch] text-[14.5px] leading-[1.7] text-soft"></p>
       </div>
-      <p data-hero-blurb class="m-0 min-w-0 flex-[1_1_280px] text-[14.5px] leading-[1.7] text-soft"></p>
+      <div data-hero-visual class="hatch flex min-w-0 flex-[1_1_300px] items-end self-stretch border border-line bg-cover bg-center p-3 min-h-[220px]">
+        <span data-hero-caption class="bg-card px-1.5 py-[3px] font-mono text-[10px] tracking-[0.08em] text-faint"></span>
+      </div>
     </section>
 
     <div id="archive" class="flex flex-wrap items-start gap-x-[52px] gap-y-9 pt-8">
 
       <!-- facet rail -->
-      <aside class="flex min-w-0 max-w-[260px] flex-[1_1_220px] flex-col gap-7">
+      <aside class="scrollbar-thin sticky top-[86px] flex max-h-[calc(100vh-102px)] min-w-0 max-w-[260px] flex-[1_1_220px] flex-col gap-7 self-start overflow-y-auto pb-2 pr-1">
         <div class="flex flex-col gap-3">
           <div class="eti text-muted">Valuation, <span data-cur-sign>$</span></div>
           <input data-price-range type="range" class="w-full" />
@@ -113,6 +116,8 @@ import Layout from '../layouts/Layout.astro';
       const h = houseOf(getHouse());
       $('[data-hero-title]').textContent = h.title;
       $('[data-hero-blurb]').textContent = h.blurb;
+      $('[data-hero-visual]').style.backgroundImage = h.heroImage ? `url('${h.heroImage}')` : '';
+      $('[data-hero-caption]').textContent = h.megaImage || '';
     }
 
     // ── facets ──
