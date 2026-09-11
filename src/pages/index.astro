@@ -9,14 +9,14 @@ import Layout from '../layouts/Layout.astro';
   <main class="mx-auto max-w-[1240px] px-6" data-catalog>
 
     <!-- house hero: pinned scene — era tiles slide in from the left over the copy -->
-    <div data-hero-scene class="lg:h-[185vh]">
-    <section class="flex flex-wrap items-center gap-x-12 gap-y-7 border-b border-line pb-9 pt-14 lg:sticky lg:top-0 lg:min-h-[calc(100vh-96px)] lg:pb-6 lg:pt-24">
+    <div data-hero-scene class="lg:h-[150vh]">
+    <section class="flex flex-wrap items-center gap-x-12 gap-y-7 border-b border-line pb-9 pt-14 lg:sticky lg:top-[74px] lg:pt-14 bg-paper">
       <div class="flex min-w-0 flex-[1_1_380px] flex-col">
         <div class="eti mb-[18px] text-acc" style="letter-spacing:0.18em">Archive editions</div>
         <h1 data-hero-title class="font-sf m-0 text-[clamp(30px,4.4vw,46px)] leading-[1.1] tracking-[-0.01em]"></h1>
         <p data-hero-blurb class="m-0 mt-5 max-w-[54ch] text-[14.5px] leading-[1.7] text-soft"></p>
       </div>
-      <div data-hero-tiles class="relative z-10 flex min-w-0 flex-[1_1_360px] gap-3"></div>
+      <div data-hero-tiles class="flex min-w-0 flex-[1_1_360px] gap-3"></div>
     </section>
     </div>
 
@@ -145,10 +145,11 @@ import Layout from '../layouts/Layout.astro';
       const total = heroSceneEl.offsetHeight - window.innerHeight;
       const prog = total > 0 ? Math.min(1, Math.max(0, -heroSceneEl.getBoundingClientRect().top / total)) : 1;
       tiles.forEach((el, i) => {
-        const d = Math.min(1, Math.max(0, (prog - i * 0.16) / 0.52));
+        /* one tile at a time, each owns a third of the scene, sliding in from the right */
+        const d = Math.min(1, Math.max(0, (prog - i * 0.33) / 0.3));
         const e2 = 1 - Math.pow(1 - d, 3);
-        el.style.transform = `translateX(${(1 - e2) * -58}vw)`;
-        el.style.opacity = String(0.15 + 0.85 * e2);
+        el.style.transform = `translateX(${(1 - e2) * 70}vw)`;
+        el.style.opacity = String(0.1 + 0.9 * e2);
       });
     }
     window.addEventListener('scroll', heroScene, { passive: true });
