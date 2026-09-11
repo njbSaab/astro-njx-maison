@@ -23,7 +23,7 @@ import Layout from '../layouts/Layout.astro';
             <button data-sign-out class="eti cursor-pointer text-faint transition hover:text-acc" style="font-size:11px">Sign out</button>
           </div>
           <h1 data-p-name class="font-sf m-0 mb-3.5 text-[clamp(28px,4vw,42px)] leading-[1.1]"></h1>
-          <div data-p-line class="font-mono text-[11.5px] tracking-[0.04em] text-soft"></div>
+          <div data-p-line class="hidden font-mono text-[11.5px] tracking-[0.04em] text-soft sm:block"></div>
         </div>
       </section>
 
@@ -123,7 +123,7 @@ import Layout from '../layouts/Layout.astro';
                   ${STEPS.map((l, n) => `
                     <div class="flex min-w-0 flex-1 flex-col gap-2">
                       <div class="mr-[3px] h-0.5 ${n < o.stage ? 'bg-acc' : 'bg-rule'}"></div>
-                      <span class="eti leading-[1.5] text-faint" style="font-size:9.5px">${l}</span>
+                      <span class="eti leading-[1.5] text-faint ${n === o.stage - 1 ? '' : 'hidden sm:block'}" style="font-size:9.5px">${l}</span>
                     </div>`).join('')}
                 </div>
                 <div class="flex flex-wrap items-center gap-x-5 gap-y-2 text-[13px] text-soft">
