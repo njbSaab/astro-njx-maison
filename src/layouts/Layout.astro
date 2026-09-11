@@ -155,11 +155,13 @@ const clientData = JSON.stringify({
 
     <!-- ── Footer ── -->
     <footer class="mt-20 border-t border-line bg-tint">
-      <div class="eti mx-auto flex max-w-[1240px] flex-wrap items-center justify-between gap-3 px-6 py-6 text-faint">
+      <div class="eti mx-auto flex max-w-[1240px] flex-col gap-3 px-3 py-5 text-faint sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:gap-3 sm:px-6 sm:py-6">
         <span><span data-footer-name class="text-soft"></span> · <span data-footer-meta></span></span>
-        <span>Astro · Tailwind v4 · Shopify Storefront API</span>
-        <span>Free theme — <a href="https://github.com/njbSaab/astro-njx-maison" target="_blank" rel="noopener" class="text-soft transition hover:text-acc">★ star it on GitHub</a></span>
-        <span>More themes by <a href="https://njxui.dev/themes" target="_blank" rel="noopener" class="text-acc hover:text-acc-deep">njX UI</a></span>
+        <span class="hidden lg:inline">Astro · Tailwind v4 · Shopify Storefront API</span>
+        <span class="flex flex-wrap gap-x-5 gap-y-1.5">
+          <a href="https://github.com/njbSaab/astro-njx-maison" target="_blank" rel="noopener" class="text-soft transition hover:text-acc">★ Free on GitHub</a>
+          <a href="https://njxui.dev/themes" target="_blank" rel="noopener" class="text-acc hover:text-acc-deep">More themes → njX UI</a>
+        </span>
       </div>
     </footer>
 
