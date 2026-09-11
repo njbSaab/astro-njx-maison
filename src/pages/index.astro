@@ -8,9 +8,8 @@ import Layout from '../layouts/Layout.astro';
 <Layout>
   <main class="mx-auto max-w-[1240px] px-6" data-catalog>
 
-    <!-- house hero: pinned scene — era tiles slide in from the left over the copy -->
-    <div data-hero-scene class="lg:h-[150vh]">
-    <section class="flex flex-wrap items-center gap-x-12 gap-y-7 border-b border-line pb-9 pt-14 lg:sticky lg:top-[74px] lg:pt-14 bg-paper">
+    <!-- house hero: era tiles ride in from the right over the first scroll -->
+    <section data-hero-scene class="flex flex-wrap items-center gap-x-12 gap-y-7 border-b border-line pb-9 pt-14">
       <div class="flex min-w-0 flex-[1_1_380px] flex-col">
         <div class="eti mb-[18px] text-acc" style="letter-spacing:0.18em">Archive editions</div>
         <h1 data-hero-title class="font-sf m-0 text-[clamp(30px,4.4vw,46px)] leading-[1.1] tracking-[-0.01em]"></h1>
@@ -18,7 +17,6 @@ import Layout from '../layouts/Layout.astro';
       </div>
       <div data-hero-tiles class="flex min-w-0 flex-[1_1_360px] gap-3"></div>
     </section>
-    </div>
 
     <div id="archive" class="flex flex-wrap items-start gap-x-[52px] gap-y-9 pt-8">
 
@@ -142,8 +140,9 @@ import Layout from '../layouts/Layout.astro';
         tiles.forEach((el) => { el.style.transform = ''; el.style.opacity = ''; });
         return;
       }
-      const total = heroSceneEl.offsetHeight - window.innerHeight;
-      const prog = total > 0 ? Math.min(1, Math.max(0, -heroSceneEl.getBoundingClientRect().top / total)) : 1;
+      /* no pinning: the shopfront stays put; tiles finish over the first ~500px
+         of ordinary scrolling, and the first one is already in place on load */
+      const prog = Math.min(1, 0.36 + window.scrollY / 520);
       tiles.forEach((el, i) => {
         /* one tile at a time, each owns a third of the scene, sliding in from the right */
         const d = Math.min(1, Math.max(0, (prog - i * 0.33) / 0.3));
