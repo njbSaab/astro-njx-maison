@@ -95,9 +95,15 @@ const clientData = JSON.stringify({
 
     <!-- ── Archive-house strip ── -->
     <div class="border-b border-line bg-tint">
-      <div class="eti mx-auto flex max-w-[1240px] flex-wrap items-center gap-x-[22px] gap-y-2 px-6 py-[9px]">
+      <div class="eti mx-auto flex max-w-[1240px] flex-wrap items-center gap-x-[22px] gap-y-2 px-3 py-1.5 sm:px-6 sm:py-[9px]">
         <span class="hidden text-faint sm:inline">Archive houses</span>
-        <span data-house-tabs class="flex flex-wrap gap-x-4 gap-y-1 sm:gap-x-[22px]"></span>
+        <span data-house-tabs class="hidden flex-wrap gap-x-4 gap-y-1 sm:flex sm:gap-x-[22px]"></span>
+        <span class="relative sm:hidden" data-house-dd>
+          <button data-house-dd-btn class="flex cursor-pointer items-center gap-1.5 text-ink">
+            <span data-house-dd-label class="tab-on"></span><span class="text-[9px] text-faint">▾</span>
+          </button>
+          <span data-house-dd-list class="absolute left-0 top-[calc(100%+7px)] z-40 hidden min-w-[190px] flex-col gap-2.5 border border-line bg-card p-3 shadow-[0_18px_32px_-24px_oklch(0.22_0.006_0/0.35)] [&.open]:flex"></span>
+        </span>
         <span class="flex-1"></span>
         <a href="https://github.com/njbSaab/astro-njx-maison" target="_blank" rel="noopener" class="hidden text-soft transition hover:text-acc sm:inline">★ Free on GitHub</a>
         <span data-house-meta class="hidden text-faint sm:inline"></span>
@@ -106,7 +112,7 @@ const clientData = JSON.stringify({
 
     <!-- ── Masthead ── -->
     <header class="sticky top-0 z-30 border-b border-rule bg-card">
-      <div class="mx-auto flex max-w-[1240px] flex-wrap items-center gap-x-[26px] gap-y-3.5 px-6 py-3.5">
+      <div class="mx-auto flex max-w-[1240px] flex-wrap items-center gap-x-3 gap-y-2 p-2 sm:gap-x-[26px] sm:gap-y-3.5 sm:px-6 sm:py-3.5">
         <a href="/" data-house-name class="font-sf order-1 min-w-0 flex-1 basis-auto text-[18px] tracking-[0.01em] text-ink sm:order-none sm:text-[20px]"></a>
         <nav class="order-3 flex basis-full flex-wrap items-center gap-x-4 gap-y-2 text-[13.5px] tracking-[0.02em] sm:order-none sm:basis-auto sm:gap-[22px]">
           <button data-mega-btn class="cursor-pointer pb-0.5 text-soft transition hover:text-acc [&.open]:text-acc [&.open]:border-b [&.open]:border-acc">Collections</button>
@@ -120,9 +126,9 @@ const clientData = JSON.stringify({
             <span><span class="hidden sm:inline">Bag · </span><span data-bag-n>0</span></span>
           </button>
           <a href="/account" data-patron-link class="hidden tab-on [&.show]:inline"></a>
-          <button data-auth-btn class="btn-keeper px-3.5 py-[7px] [&.hide]:hidden">Sign in</button>
+          <button data-auth-btn class="btn-keeper px-2.5 py-[7px] sm:px-3.5 [&.hide]:hidden">Sign in</button>
         </nav>
-        <button data-search-open class="order-2 flex flex-none cursor-pointer items-center gap-3 rounded-[2px] border border-rule px-3 py-[7px] text-[13px] text-muted transition hover:border-faint sm:order-none sm:min-w-[132px] sm:basis-[200px]">
+        <button data-search-open class="order-2 flex flex-none cursor-pointer items-center gap-3 rounded-[2px] border border-rule px-2 py-[7px] text-[13px] text-muted transition hover:border-faint sm:order-none sm:min-w-[132px] sm:basis-[200px] sm:px-3">
         <svg class="ico-sm sm:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
           <span class="hidden flex-1 text-left sm:block">Search</span>
           <span class="hidden font-mono text-[11px] text-faint sm:inline">⌘K</span>
@@ -300,6 +306,9 @@ const clientData = JSON.stringify({
         const h = houseOf(getHouse());
         $('[data-house-tabs]').innerHTML = D.houses.map((x: any) => `
           <button data-house="${x.handle}" class="cursor-pointer ${x.handle === h.handle ? 'tab-on' : 'text-muted transition hover:text-ink'}">${x.short}</button>`).join('');
+        $('[data-house-dd-label]').textContent = h.short;
+        $('[data-house-dd-list]').innerHTML = D.houses.filter((x: any) => x.handle !== h.handle).map((x: any) => `
+          <button data-house="${x.handle}" class="cursor-pointer text-left text-muted transition hover:text-ink">${x.short}</button>`).join('');
         $('[data-house-meta]').textContent = h.meta;
         $('[data-house-name]').textContent = h.name;
         $('[data-footer-name]').textContent = h.name;
@@ -308,8 +317,11 @@ const clientData = JSON.stringify({
         paintMega();
       }
       document.addEventListener('click', (e) => {
-        const b = (e.target as HTMLElement).closest<HTMLElement>('[data-house]');
+        const t = e.target as HTMLElement;
+        if (t.closest('[data-house-dd-btn]')) { $('[data-house-dd-list]').classList.toggle('open'); return; }
+        const b = t.closest<HTMLElement>('[data-house]');
         if (b) setHouse(b.dataset.house!);
+        if (b || !t.closest('[data-house-dd]')) $('[data-house-dd-list]').classList.remove('open');
       });
 
       // ── mega ──
