@@ -1,5 +1,7 @@
 # Maison — a printed archive, not a webshop
 
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/njbSaab/astro-njx-maison) [![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/njbSaab/astro-njx-maison)
+
 **Free classic Astro e-commerce theme.** Serif typography on warm paper, hairline rules,
 three archive houses and a patron cabinet — no neon, no glow, no checkout theatre.
 
