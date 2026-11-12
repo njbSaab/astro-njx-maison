@@ -1,9 +1,9 @@
 ---
 // Maison piece record — static for SEO, printed-ledger layout.
 // Save / Add to bag talk to the Layout stores via the maison:toggle event.
-import Layout from '@/layouts/Layout.astro';
-import { commerce } from '@/lib/commerce';
-import catalog from '@/data/astro_free_themes.json';
+import Layout from '../../layouts/Layout.astro';
+import { commerce } from '../../lib/commerce';
+import catalog from '../../data/astro_free_themes.json';
 
 export async function getStaticPaths() {
   const products = await commerce.listProducts();
