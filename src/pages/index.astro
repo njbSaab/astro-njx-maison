@@ -73,7 +73,7 @@ import Layout from '../layouts/Layout.astro';
   <script>
     const D = (window as any).MAISON ?? JSON.parse(document.body.dataset.maison!);
     const $ = <T extends HTMLElement = HTMLElement>(s: string) => document.querySelector<T>(s)!;
-    const getHouse = () => localStorage.getItem('njx-maison-house') ?? 'horlogerie';
+    const getHouse = () => localStorage.getItem('njx-maison-house') ?? 'Blog';
     const houseOf = (h: string) => D.houses.find((x: any) => x.handle === h) ?? D.houses[0];
     const money = (n: number) => (window as any).maisonMoney ? (window as any).maisonMoney(n) : '$' + n.toLocaleString('en-US');
     const savedOf = (): string[] => { try { return JSON.parse(localStorage.getItem('njx-maison-vault') ?? '[]'); } catch { return []; } };
