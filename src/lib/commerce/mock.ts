@@ -3,7 +3,7 @@
  * no keys, no accounts. Swap via COMMERCE_PROVIDER env (see index.ts).
  */
 import type { CommerceProvider, Product, Collection, CartLine } from './types';
-import catalog from '../../data/astro_free_themes.json';
+import catalog from '../../data/astro-free-themes.json';
 
 const products = catalog.products as unknown as Product[];
 const collections = catalog.collections as unknown as Collection[];

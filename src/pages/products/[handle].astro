@@ -3,7 +3,7 @@
 // Save / Add to bag talk to the Layout stores via the maison:toggle event.
 import Layout from '../../layouts/Layout.astro';
 import { commerce } from '../../lib/commerce';
-import catalog from '../../data/astro_free_themes.json';
+import catalog from '../../data/astro-free-themes.json';
 
 export async function getStaticPaths() {
   const products = await commerce.listProducts();
