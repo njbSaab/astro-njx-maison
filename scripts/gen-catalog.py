@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate src/data/mock-catalog.json for Maison (3 archive houses × 12 pieces)
+"""Generate src/data/astro_free_themes.json for Maison (3 archive houses × 12 pieces)
 and scripts/photos.json (per-file candidate URLs for fetch-photos.py)."""
 import json, os, re
 
@@ -135,6 +135,6 @@ for h in HOUSES:
 
 out = {'collections': collections, 'products': products}
 root = os.path.join(os.path.dirname(__file__), '..')
-json.dump(out, open(os.path.join(root, 'src/data/mock-catalog.json'), 'w'), indent=1, ensure_ascii=False)
+json.dump(out, open(os.path.join(root, 'src/data/astro_free_themes.json'), 'w'), indent=1, ensure_ascii=False)
 json.dump(photos, open(os.path.join(root, 'scripts/photos.json'), 'w'), indent=1)
 print(len(products), 'pieces across', len(collections), 'houses')

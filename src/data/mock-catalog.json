@@ -1,7 +1,7 @@
 {
  "collections": [
   {
-   "handle": "horlogerie",
+   "handle": "Blog",
    "name": "Maison de Haute Horlogerie",
    "short": "Haute Horlogerie",
    "meta": "Est. 1888 · Genève",
@@ -89,7 +89,7 @@
    ]
   },
   {
-   "handle": "kingsman",
+   "handle": "Docs",
    "name": "Kingsman & Sterling Bespoke",
    "short": "Kingsman & Sterling",
    "meta": "Est. 1904 · Savile Row",
@@ -177,7 +177,7 @@
    ]
   },
   {
-   "handle": "bibliophiles",
+   "handle": "E-commerce",
    "name": "L'Atelier des Bibliophiles",
    "short": "Bibliophiles",
    "meta": "Est. 1792 · Paris",

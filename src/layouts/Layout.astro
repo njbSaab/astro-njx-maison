@@ -5,7 +5,7 @@
 // (no checkout — "Request the keeper"), patron auth and live currency.
 import '../styles/global.css';
 import { commerce, providerName } from '../lib/commerce';
-import catalog from '../data/mock-catalog.json';
+import catalog from '@/data/astro_free_themes.json';
 
 interface Props {
   title?: string;
@@ -13,12 +13,12 @@ interface Props {
   ogImage?: string;
 }
 const {
-  title = 'Maison — classic archive storefront theme for Astro',
-  description = 'A printed, editorial light theme: three archive houses, faceted catalogue, patron cabinet, private vault and live currency switching. Astro + Tailwind v4, Shopify-ready.',
+  title = 'Astro themes Maison',
+  description = 'Astro themes archive',
   ogImage,
 } = Astro.props;
 
-const siteOrigin = (Astro.site ?? new URL('https://astro-njx-maison.pages.dev')).origin;
+const siteOrigin = (Astro.site ?? new URL('https://astro-themes-maison.vercel.app')).origin;
 const canonicalURL = new URL(Astro.url.pathname, siteOrigin).href;
 const ogImageURL = new URL(ogImage ?? '/logo/maison-og.png', siteOrigin).href;
 const ga4Id = import.meta.env.PUBLIC_GA4_ID;
@@ -277,7 +277,7 @@ const clientData = JSON.stringify({
       const HEART = (on: boolean, cls = 'ico-sm') => `<svg class="${cls}" viewBox="0 0 24 24" fill="${on ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>`;
       const BAG_ICO = `<svg class="ico-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>`;
       const HOUSE_KEY = 'njx-maison-house';
-      const getHouse = () => localStorage.getItem(HOUSE_KEY) ?? 'horlogerie';
+      const getHouse = () => localStorage.getItem(HOUSE_KEY) ?? 'Blog';
       const houseOf = (h: string) => D.houses.find((x: any) => x.handle === h) ?? D.houses[0];
       const pieceBy = (h: string) => D.pieces.find((p: any) => p.handle === h);
       (window as any).maisonGetHouse = getHouse;
